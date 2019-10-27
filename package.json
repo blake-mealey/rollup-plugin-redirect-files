@@ -1,9 +1,9 @@
 {
   "name": "rollup-plugin-redirect-files",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Redirect file imports using Rollup",
-  "main": "dist/index.commonjs.js",
-  "module": "dist/index.module.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
   "types": "index.d.ts",
   "scripts": {
     "build": "rollup -c",
