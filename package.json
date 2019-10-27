@@ -1,0 +1,41 @@
+{
+  "name": "rollup-plugin-redirect-files",
+  "version": "0.0.1",
+  "description": "Redirect file imports using Rollup",
+  "main": "dist/index.commonjs.js",
+  "module": "dist/index.module.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blake-mealey/rollup-plugin-redirect-files.git"
+  },
+  "files": [
+    "dist",
+    "index.d.ts",
+    "README.md"
+  ],
+  "keywords": [
+    "rollup",
+    "rollup-plugin",
+    "import",
+    "redirect",
+    "file",
+    "files"
+  ],
+  "author": "Blake Mealey <blakemealey@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/blake-mealey/rollup-plugin-redirect-files/issues"
+  },
+  "homepage": "https://github.com/blake-mealey/rollup-plugin-redirect-files#readme",
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "rollup": "^1.26.0",
+    "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-babel": "^4.3.3"
+  }
+}
