@@ -6,7 +6,8 @@
   "module": "dist/index.module.js",
   "types": "index.d.ts",
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
