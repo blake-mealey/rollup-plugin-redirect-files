@@ -1,4 +1,5 @@
 import { isNullOrUndefined } from 'util';
+import { missingFrom, tooManyFroms, missingToForFrom, toExtNotAllowedForFrom, missingToExtForFromExt, toNotAllowedForFromExt } from './errorMessages';
 
 function normalizeExtension(extension) {
     return extension.startsWith(`.`) ? extension : `.${extension}`;
@@ -8,31 +9,31 @@ function verifyTargets(targets) {
     for (const target of targets) {
         // General checks
         if (isNullOrUndefined(target.from) && isNullOrUndefined(target.fromExt)) {
-            throw new Error(`Missing 'from' or 'fromExt'`)
+            throw new Error(missingFrom(target))
         }
-        if (target.from && target.fromExt) {
-            throw new Error(`Cannot specify both 'from' and 'fromExt'`);
+        if (!isNullOrUndefined(target.from) && !isNullOrUndefined(target.fromExt)) {
+            throw new Error(tooManyFroms(target));
         }
 
         // 'from' checks
-        if (target.from && isNullOrUndefined(target.to)) {
-            throw new Error(`Missing 'to' for 'from' "${target.from}"`);
+        if (!isNullOrUndefined(target.from) && isNullOrUndefined(target.to)) {
+            throw new Error(missingToForFrom(target));
         }
-        if (target.from && target.toExt) {
-            throw new Error(`Cannot specify 'toExt' for 'from' "${target.from}" - use 'fromExt' or 'to' instead`);
+        if (!isNullOrUndefined(target.from) && !isNullOrUndefined(target.toExt)) {
+            throw new Error(toExtNotAllowedForFrom(target));
         }
 
         // 'fromExt' checks
-        if (target.fromExt && isNullOrUndefined(target.toExt)) {
-            throw new Error(`Missing 'toExt' for 'fromExt' "${target.fromExt}"`);
+        if (!isNullOrUndefined(target.fromExt) && isNullOrUndefined(target.toExt)) {
+            throw new Error(missingToExtForFromExt(target));
         }
-        if (target.fromExt && target.to) {
-            throw new Error(`Cannot specify 'to' for 'fromExt' "${target.fromExt}" - use 'from' or 'toExt' instead`);
+        if (!isNullOrUndefined(target.fromExt) && !isNullOrUndefined(target.to)) {
+            throw new Error(toNotAllowedForFromExt(target));
         }
     }
 }
 
-export default function redirect(options) {
+export default function redirect(options = {}) {
     const {
         targets = [],
         verbose = false
