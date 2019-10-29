@@ -32,6 +32,8 @@ function verifyTarget(target) {
   if (!isNullOrUndefined(target.fromExt) && !isNullOrUndefined(target.to)) {
     throw new Error(toNotAllowedForFromExt(target));
   }
+
+  return target;
 }
 
 export default function redirect(options = {}) {
@@ -41,7 +43,7 @@ export default function redirect(options = {}) {
   } = options;
 
   const targets = inputTargets
-    .forEach(verifyTarget)
+    .map(verifyTarget)
     .map(target => {
       if (target.from) {
         return target;

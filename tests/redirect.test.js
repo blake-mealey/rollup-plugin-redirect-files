@@ -54,30 +54,8 @@ test('redirects matching files with capture group replacement', async t => {
   sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
 });
 
-test('maps fromExt, toExt -> from, to', t => {
-  const target = { fromExt: '.env', toExt: '.prod' };
-
-  redirect({
-    targets: [target],
-  });
-
-  t.is(target.from, '^(.*)\\.env(.*)$');
-  t.is(target.to, '$1.prod$2');
-});
-
-test('normalizes and maps fromExt, toExt -> from, to', t => {
-  const target = { fromExt: 'env', toExt: 'prod' };
-
-  redirect({
-    targets: [target],
-  });
-
-  t.is(target.from, '^(.*)\\.env(.*)$');
-  t.is(target.to, '$1.prod$2');
-});
-
 test('does not redirect non-matching file extensions', async t => {
-  const target = { fromExt: 'env', toExt: 'prod' };
+  const target = { fromExt: '.env', toExt: '.prod' };
   const plugin = redirect({
     targets: [target],
   });
@@ -92,6 +70,21 @@ test('does not redirect non-matching file extensions', async t => {
 });
 
 test('redirects matching file extensions', async t => {
+  const target = { fromExt: '.env', toExt: '.prod' };
+  const plugin = redirect({
+    targets: [target],
+  });
+
+  const id = 'file.env';
+  const importer = 'importer.js';
+  const newId = await plugin.resolveId.apply(t.context.rollupContext, [id, importer]);
+
+  t.is(newId, 'file.prod');
+  sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
+  sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
+});
+
+test('normalizes and redirects matching file extensions', async t => {
   const target = { fromExt: 'env', toExt: 'prod' };
   const plugin = redirect({
     targets: [target],
