@@ -6,6 +6,7 @@
   "module": "dist/index.es.js",
   "types": "index.d.ts",
   "scripts": {
+    "lint": "eslint src tests",
     "build": "rollup -c",
     "prepublishOnly": "npm run test && npm run build",
     "test": "ava --verbose"
@@ -37,6 +38,9 @@
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
     "ava": "^2.4.0",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
     "esm": "^3.2.25",
     "rollup": "^1.26.0",
     "rollup-plugin-auto-external": "^2.0.0",
