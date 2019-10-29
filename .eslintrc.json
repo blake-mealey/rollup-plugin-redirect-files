@@ -15,5 +15,9 @@
         "sourceType": "module"
     },
     "rules": {
+        "no-console": "off",
+        "arrow-parens": ["error", "as-needed"],
+        "no-param-reassign": "off",
+        "comma-dangle": "off"
     }
 }

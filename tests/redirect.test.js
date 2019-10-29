@@ -2,14 +2,14 @@ import test from 'ava';
 import sinon from 'sinon';
 import redirect from '../src';
 
-test.beforeEach((t) => {
+test.beforeEach(t => {
   t.context.rollupContext = {
     addWatchFile: sinon.fake(),
-    resolve: sinon.fake((id) => id),
+    resolve: sinon.fake(id => id),
   };
 });
 
-test('does not redirect non-matching files', async (t) => {
+test('does not redirect non-matching files', async t => {
   const target = { from: 'match', to: 'redirect' };
   const plugin = redirect({
     targets: [target],
@@ -24,7 +24,7 @@ test('does not redirect non-matching files', async (t) => {
   sinon.assert.notCalled(t.context.rollupContext.addWatchFile);
 });
 
-test('redirects matching files', async (t) => {
+test('redirects matching files', async t => {
   const target = { from: 'match', to: 'redirect' };
   const plugin = redirect({
     targets: [target],
@@ -39,7 +39,7 @@ test('redirects matching files', async (t) => {
   sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
 });
 
-test('redirects matching files with capture group replacement', async (t) => {
+test('redirects matching files with capture group replacement', async t => {
   const target = { from: /^(first)-(second)$/, to: 'redirect-$1-$2' };
   const plugin = redirect({
     targets: [target],
@@ -54,7 +54,7 @@ test('redirects matching files with capture group replacement', async (t) => {
   sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
 });
 
-test('maps fromExt, toExt -> from, to', (t) => {
+test('maps fromExt, toExt -> from, to', t => {
   const target = { fromExt: '.env', toExt: '.prod' };
 
   redirect({
@@ -65,7 +65,7 @@ test('maps fromExt, toExt -> from, to', (t) => {
   t.is(target.to, '$1.prod$2');
 });
 
-test('normalizes and maps fromExt, toExt -> from, to', (t) => {
+test('normalizes and maps fromExt, toExt -> from, to', t => {
   const target = { fromExt: 'env', toExt: 'prod' };
 
   redirect({
@@ -76,7 +76,7 @@ test('normalizes and maps fromExt, toExt -> from, to', (t) => {
   t.is(target.to, '$1.prod$2');
 });
 
-test('does not redirect non-matching file extensions', async (t) => {
+test('does not redirect non-matching file extensions', async t => {
   const target = { fromExt: 'env', toExt: 'prod' };
   const plugin = redirect({
     targets: [target],
@@ -91,7 +91,7 @@ test('does not redirect non-matching file extensions', async (t) => {
   sinon.assert.notCalled(t.context.rollupContext.addWatchFile);
 });
 
-test('redirects matching file extensions', async (t) => {
+test('redirects matching file extensions', async t => {
   const target = { fromExt: 'env', toExt: 'prod' };
   const plugin = redirect({
     targets: [target],
