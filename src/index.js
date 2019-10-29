@@ -49,6 +49,7 @@ export default function redirect(options = {}) {
     }
 
     return {
+        name: 'redirect-files',
         async resolveId(id, importer) {
             for (const target of targets) {
                 const result = id.match(target.from);
