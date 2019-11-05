@@ -16,10 +16,8 @@ steps:
     command: custom
     customCommand: run test:cover
 
-- task: PowerShell@2
-  displayName: Info
-  inputs:
-    script: pwd && ls
+- script: pwd && ls
+  displayName: info 1
 
 - task: Npm@1
   displayName: Run tests
@@ -27,10 +25,8 @@ steps:
     command: custom
     customCommand: run test:report
 
-- task: PowerShell@2
-  displayName: Info2
-  inputs:
-    script: pwd && ls
+- script: pwd && ls
+  displayName: info 2
 
 - task: PublishTestResults@2
   displayName: Publish test results
