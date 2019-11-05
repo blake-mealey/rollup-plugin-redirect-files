@@ -16,6 +16,11 @@ steps:
     command: custom
     customCommand: run test:cover
 
+- task: PowerShell@2
+  displayName: Info
+  inputs:
+    script: pwd && ls
+
 - task: Npm@1
   displayName: Run tests
   inputs:
@@ -23,7 +28,7 @@ steps:
     customCommand: run test:report
 
 - task: PowerShell@2
-  displayName: Info
+  displayName: Info2
   inputs:
     script: pwd && ls
 
