@@ -1,0 +1,32 @@
+trigger:
+- master
+
+pr:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Npm@1
+  displayName: Install depenencies
+  inputs:
+    command: install
+
+- task: Npm@1
+  displayName: Run tests with coverage
+  inputs:
+    command: custom
+    customCommand: run test:cover
+
+- task: PublishTestResults@2
+  displayName: Publish test results
+  inputs:
+    testResultsFormat: XUnit
+    testResultsFiles: xunit-results.xml
+
+- task: PublishCodeCoverageResults@1
+  displayName: Publsh coverage results
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: coverage/cobertura-coverage.xml
