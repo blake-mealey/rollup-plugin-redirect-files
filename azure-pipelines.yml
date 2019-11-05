@@ -1,9 +1,6 @@
 trigger:
 - master
 
-pr:
-- master
-
 pool:
   vmImage: 'windows-latest'
 
@@ -18,6 +15,17 @@ steps:
   inputs:
     command: custom
     customCommand: run test:cover
+
+- task: Npm@1
+  displayName: Run tests
+  inputs:
+    command: custom
+    customCommand: run test:report
+
+- task: PowerShell@2
+  displayName: Info
+  inputs:
+    script: pwd && ls
 
 - task: PublishTestResults@2
   displayName: Publish test results
