@@ -5,11 +5,11 @@ pr:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 steps:
 - task: Npm@1
-  displayName: Install depenencies
+  displayName: Install dependencies
   inputs:
     command: install
 
