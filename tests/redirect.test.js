@@ -1,22 +1,23 @@
 import test from 'ava';
-import redirect from '../src';
 import sinon from 'sinon';
+import redirect from '../src';
 
 test.beforeEach(t => {
+    // eslint-disable-next-line no-param-reassign
     t.context.rollupContext = {
         addWatchFile: sinon.fake(),
         resolve: sinon.fake(id => id)
     };
 });
 
-test('does not redirect non-matching files', async t => {
-    const target = { from: 'match', to: 'redirect' };
+test(`does not redirect non-matching files`, async t => {
+    const target = { from: `match`, to: `redirect` };
     const plugin = redirect({
         targets: [ target ]
     });
 
-    const id = 'random';
-    const importer = 'importer.js';
+    const id = `random`;
+    const importer = `importer.js`;
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, null);
@@ -24,14 +25,14 @@ test('does not redirect non-matching files', async t => {
     sinon.assert.notCalled(t.context.rollupContext.addWatchFile);
 });
 
-test('redirects matching files', async t => {
-    const target = { from: 'match', to: 'redirect' };
+test(`redirects matching files`, async t => {
+    const target = { from: `match`, to: `redirect` };
     const plugin = redirect({
         targets: [ target ]
     });
 
-    const id = 'match';
-    const importer = 'importer.js';
+    const id = `match`;
+    const importer = `importer.js`;
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, target.to);
@@ -39,51 +40,29 @@ test('redirects matching files', async t => {
     sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
 });
 
-test('redirects matching files with capture group replacement', async t => {
-    const target = { from: /^(first)-(second)$/, to: 'redirect-$1-$2' };
+test(`redirects matching files with capture group replacement`, async t => {
+    const target = { from: /^(first)-(second)$/, to: `redirect-$1-$2` };
     const plugin = redirect({
         targets: [ target ]
     });
 
-    const id = 'first-second';
-    const importer = 'importer.js';
+    const id = `first-second`;
+    const importer = `importer.js`;
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
-    t.is(newId, 'redirect-first-second');
+    t.is(newId, `redirect-first-second`);
     sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
     sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
 });
 
-test('maps fromExt, toExt -> from, to', t => {
-    const target = { fromExt: '.env', toExt: '.prod' };
-
-    redirect({
-        targets: [ target ]
-    });
-
-    t.is(target.from, '^(.*)\\.env(.*)$');
-    t.is(target.to, '$1.prod$2');
-});
-
-test('normalizes and maps fromExt, toExt -> from, to', t => {
-    const target = { fromExt: 'env', toExt: 'prod' };
-
-    redirect({
-        targets: [ target ]
-    });
-
-    t.is(target.from, '^(.*)\\.env(.*)$');
-    t.is(target.to, '$1.prod$2');
-});
-
-test('does not redirect non-matching file extensions', async t => {
-    const target = { fromExt: 'env', toExt: 'prod' };
+test(`does not redirect non-matching file extensions`, async t => {
+    const target = { fromExt: `.env`, toExt: `.prod` };
     const plugin = redirect({
         targets: [ target ]
     });
 
-    const id = 'file.dev';
-    const importer = 'importer.js';
+    const id = `file.dev`;
+    const importer = `importer.js`;
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, null);
@@ -91,17 +70,32 @@ test('does not redirect non-matching file extensions', async t => {
     sinon.assert.notCalled(t.context.rollupContext.addWatchFile);
 });
 
-test('redirects matching file extensions', async t => {
-    const target = { fromExt: 'env', toExt: 'prod' };
+test(`redirects matching file extensions`, async t => {
+    const target = { fromExt: `.env`, toExt: `.prod` };
     const plugin = redirect({
         targets: [ target ]
     });
 
-    const id = 'file.env';
-    const importer = 'importer.js';
+    const id = `file.env`;
+    const importer = `importer.js`;
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
-    t.is(newId, 'file.prod');
+    t.is(newId, `file.prod`);
+    sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
+    sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
+});
+
+test(`normalizes and redirects matching file extensions`, async t => {
+    const target = { fromExt: `env`, toExt: `prod` };
+    const plugin = redirect({
+        targets: [ target ]
+    });
+
+    const id = `file.env`;
+    const importer = `importer.js`;
+    const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
+
+    t.is(newId, `file.prod`);
     sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
     sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
 });
