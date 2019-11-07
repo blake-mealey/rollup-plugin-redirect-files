@@ -11,6 +11,12 @@ steps:
     command: install
 
 - task: Npm@1
+  displayName: Run linter
+  inputs:
+    command: custom
+    customCommand: run lint
+
+- task: Npm@1
   displayName: Run tests with coverage
   inputs:
     command: custom
