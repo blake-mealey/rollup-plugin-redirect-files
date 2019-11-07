@@ -20,8 +20,9 @@ steps:
   displayName: Publish test results
   condition: succeededOrFailed()
   inputs:
-    testResultsFormat: XUnit
-    testResultsFiles: '**/TEST-RESULTS.xml'
+    testResultsFormat: JUnit
+    searchFolder: $(System.DefaultWorkingDirectory)/test-results
+    testResultsFiles: 'test-results.xml'
 
 - task: PublishCodeCoverageResults@1
   displayName: Publsh coverage results

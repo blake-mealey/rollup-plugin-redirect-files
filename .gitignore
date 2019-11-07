@@ -8,3 +8,4 @@ dist
 .nyc_output
 coverage
 test-results.xml
+test-results
