@@ -7,4 +7,4 @@ dist
 # Reports
 .nyc_output
 coverage
-xunit-results.xml
+test-results.xml
