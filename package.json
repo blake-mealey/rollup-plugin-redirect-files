@@ -50,5 +50,8 @@
     "rollup-plugin-babel": "^4.3.3",
     "sinon": "^7.5.0",
     "tap-junit": "^3.1.0"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2"
   }
 }

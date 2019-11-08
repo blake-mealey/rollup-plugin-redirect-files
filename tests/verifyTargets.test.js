@@ -68,3 +68,17 @@ test(`target does not allow to for fromExt`, t => {
 
     t.is(error.message, toNotAllowedForFromExt(target));
 });
+
+test(`no options does nothing`, t => {
+    t.notThrows(() => redirect());
+});
+
+test(`empty options does nothing`, t => {
+    t.notThrows(() => redirect({}));
+});
+
+test(`empty targets does nothing`, t => {
+    t.notThrows(() => redirect({
+        targets: []
+    }));
+});
