@@ -1,4 +1,5 @@
 import { isNullOrUndefined } from 'util';
+import chalk from 'chalk';
 import {
     missingFrom,
     tooManyFroms,
@@ -7,8 +8,6 @@ import {
     missingToExtForFromExt,
     toNotAllowedForFromExt
 } from './errorMessages';
-import Logger from './logger';
-import chalk from 'chalk';
 
 function normalizeExtension(extension) {
     return extension.startsWith(`.`) ? extension : `.${extension}`;
@@ -75,7 +74,8 @@ export default function redirect(options = {}) {
                 const resolved = await this.resolve(newId, importer);
                 this.addWatchFile(resolved);
                 if (verbose) {
-                    Logger.log(chalk.gray.dim(`redirected`),
+                    // eslint-disable-next-line no-console
+                    console.log(chalk.gray.dim(`redirected`),
                         chalk.yellow.bold(id), chalk.gray(`→`), chalk.yellow.bold(newId));
                 }
                 return resolved;

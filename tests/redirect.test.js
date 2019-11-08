@@ -2,7 +2,6 @@ import test from 'ava';
 import sinon from 'sinon';
 import chalk from 'chalk';
 import redirect from '../src';
-import Logger from '../src/logger';
 
 test.beforeEach(t => {
     // eslint-disable-next-line no-param-reassign
@@ -10,6 +9,10 @@ test.beforeEach(t => {
         addWatchFile: sinon.fake(),
         resolve: sinon.fake(id => id)
     };
+});
+
+test.afterEach(() => {
+    sinon.restore();
 });
 
 test(`does not redirect non-matching files`, async t => {
@@ -109,27 +112,25 @@ test(`verbose logs redirects`, async t => {
         verbose: true
     });
 
-    const log = sinon.stub(Logger, `log`);
+    sinon.stub(console, `log`);
 
     const id = `file.env`;
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, `importer.js` ]);
 
-    t.assert(log.calledOnceWithExactly(chalk.gray.dim(`redirected`),
+    t.assert(console.log.calledOnceWithExactly(chalk.gray.dim(`redirected`),
         chalk.yellow.bold(id), chalk.gray(`→`), chalk.yellow.bold(newId)));
-    log.restore();
 });
 
 test(`non-verbose does not log redirects`, async t => {
     const target = { fromExt: `env`, toExt: `prod` };
     const plugin = redirect({
         targets: [ target ],
-        verbose: true
+        verbose: false
     });
 
-    const log = sinon.stub(Logger, `log`);
+    sinon.stub(console, `log`);
 
     await plugin.resolveId.apply(t.context.rollupContext, [ `file.env`, `importer.js` ]);
 
-    t.assert(log.notCalled);
-    log.restore();
+    t.assert(console.log.notCalled);
 });
