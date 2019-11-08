@@ -1,4 +1,5 @@
 import { isNullOrUndefined } from 'util';
+import chalk from 'chalk';
 import {
     missingFrom,
     tooManyFroms,
@@ -12,32 +13,30 @@ function normalizeExtension(extension) {
     return extension.startsWith(`.`) ? extension : `.${extension}`;
 }
 
-function verifyTargets(targets) {
-    targets.forEach(target => {
-        // General checks
-        if (isNullOrUndefined(target.from) && isNullOrUndefined(target.fromExt)) {
-            throw new Error(missingFrom(target));
-        }
-        if (!isNullOrUndefined(target.from) && !isNullOrUndefined(target.fromExt)) {
-            throw new Error(tooManyFroms(target));
-        }
+function verifyTarget(target) {
+    // General checks
+    if (isNullOrUndefined(target.from) && isNullOrUndefined(target.fromExt)) {
+        throw new Error(missingFrom(target));
+    }
+    if (!isNullOrUndefined(target.from) && !isNullOrUndefined(target.fromExt)) {
+        throw new Error(tooManyFroms(target));
+    }
 
-        // 'from' checks
-        if (!isNullOrUndefined(target.from) && isNullOrUndefined(target.to)) {
-            throw new Error(missingToForFrom(target));
-        }
-        if (!isNullOrUndefined(target.from) && !isNullOrUndefined(target.toExt)) {
-            throw new Error(toExtNotAllowedForFrom(target));
-        }
+    // 'from' checks
+    if (!isNullOrUndefined(target.from) && isNullOrUndefined(target.to)) {
+        throw new Error(missingToForFrom(target));
+    }
+    if (!isNullOrUndefined(target.from) && !isNullOrUndefined(target.toExt)) {
+        throw new Error(toExtNotAllowedForFrom(target));
+    }
 
-        // 'fromExt' checks
-        if (!isNullOrUndefined(target.fromExt) && isNullOrUndefined(target.toExt)) {
-            throw new Error(missingToExtForFromExt(target));
-        }
-        if (!isNullOrUndefined(target.fromExt) && !isNullOrUndefined(target.to)) {
-            throw new Error(toNotAllowedForFromExt(target));
-        }
-    });
+    // 'fromExt' checks
+    if (!isNullOrUndefined(target.fromExt) && isNullOrUndefined(target.toExt)) {
+        throw new Error(missingToExtForFromExt(target));
+    }
+    if (!isNullOrUndefined(target.fromExt) && !isNullOrUndefined(target.to)) {
+        throw new Error(toNotAllowedForFromExt(target));
+    }
 }
 
 export default function redirect(options = {}) {
@@ -46,9 +45,8 @@ export default function redirect(options = {}) {
         verbose = false
     } = options;
 
-    verifyTargets(inputTargets);
-
     const targets = inputTargets.map(target => {
+        verifyTarget(target);
         if (target.fromExt) {
             return {
                 from: `^(.*)\\${normalizeExtension(target.fromExt)}(.*)$`,
@@ -77,7 +75,8 @@ export default function redirect(options = {}) {
                 this.addWatchFile(resolved);
                 if (verbose) {
                     // eslint-disable-next-line no-console
-                    console.log(`Redirect: ${id} -> ${newId}`);
+                    console.log(chalk.gray.dim(`redirected`),
+                        chalk.yellow.bold(id), chalk.gray(`→`), chalk.yellow.bold(newId));
                 }
                 return resolved;
             }

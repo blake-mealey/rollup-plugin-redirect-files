@@ -8,7 +8,7 @@
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run test && npm run build",
-    "test": "ava --verbose",
+    "test": "ava --verbose --serial",
     "test:report": "npm run test -- --tap | tap-junit -o test-results -n test-results.xml",
     "test:cover": "nyc npm run test:report",
     "lint": "eslint src tests"
@@ -50,5 +50,8 @@
     "rollup-plugin-babel": "^4.3.3",
     "sinon": "^7.5.0",
     "tap-junit": "^3.1.0"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2"
   }
 }

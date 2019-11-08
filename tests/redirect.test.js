@@ -1,5 +1,6 @@
 import test from 'ava';
 import sinon from 'sinon';
+import chalk from 'chalk';
 import redirect from '../src';
 
 test.beforeEach(t => {
@@ -8,6 +9,10 @@ test.beforeEach(t => {
         addWatchFile: sinon.fake(),
         resolve: sinon.fake(id => id)
     };
+});
+
+test.afterEach(() => {
+    sinon.restore();
 });
 
 test(`does not redirect non-matching files`, async t => {
@@ -21,8 +26,8 @@ test(`does not redirect non-matching files`, async t => {
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, null);
-    sinon.assert.notCalled(t.context.rollupContext.resolve);
-    sinon.assert.notCalled(t.context.rollupContext.addWatchFile);
+    t.assert(t.context.rollupContext.resolve.notCalled);
+    t.assert(t.context.rollupContext.addWatchFile.notCalled);
 });
 
 test(`redirects matching files`, async t => {
@@ -36,8 +41,8 @@ test(`redirects matching files`, async t => {
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, target.to);
-    sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
-    sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
+    t.assert(t.context.rollupContext.resolve.calledWithExactly(newId, importer));
+    t.assert(t.context.rollupContext.addWatchFile.calledWithExactly(newId));
 });
 
 test(`redirects matching files with capture group replacement`, async t => {
@@ -51,8 +56,8 @@ test(`redirects matching files with capture group replacement`, async t => {
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, `redirect-first-second`);
-    sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
-    sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
+    t.assert(t.context.rollupContext.resolve.calledWithExactly(newId, importer));
+    t.assert(t.context.rollupContext.addWatchFile.calledWithExactly(newId));
 });
 
 test(`does not redirect non-matching file extensions`, async t => {
@@ -66,8 +71,8 @@ test(`does not redirect non-matching file extensions`, async t => {
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, null);
-    sinon.assert.notCalled(t.context.rollupContext.resolve);
-    sinon.assert.notCalled(t.context.rollupContext.addWatchFile);
+    t.assert(t.context.rollupContext.resolve.notCalled);
+    t.assert(t.context.rollupContext.addWatchFile.notCalled);
 });
 
 test(`redirects matching file extensions`, async t => {
@@ -81,8 +86,8 @@ test(`redirects matching file extensions`, async t => {
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, `file.prod`);
-    sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
-    sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
+    t.assert(t.context.rollupContext.resolve.calledWithExactly(newId, importer));
+    t.assert(t.context.rollupContext.addWatchFile.calledWithExactly(newId));
 });
 
 test(`normalizes and redirects matching file extensions`, async t => {
@@ -96,6 +101,36 @@ test(`normalizes and redirects matching file extensions`, async t => {
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, importer ]);
 
     t.is(newId, `file.prod`);
-    sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
-    sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
+    t.assert(t.context.rollupContext.resolve.calledWithExactly(newId, importer));
+    t.assert(t.context.rollupContext.addWatchFile.calledWithExactly(newId));
+});
+
+test(`verbose logs redirects`, async t => {
+    const target = { fromExt: `env`, toExt: `prod` };
+    const plugin = redirect({
+        targets: [ target ],
+        verbose: true
+    });
+
+    sinon.stub(console, `log`);
+
+    const id = `file.env`;
+    const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, `importer.js` ]);
+
+    t.assert(console.log.calledOnceWithExactly(chalk.gray.dim(`redirected`),
+        chalk.yellow.bold(id), chalk.gray(`→`), chalk.yellow.bold(newId)));
+});
+
+test(`non-verbose does not log redirects`, async t => {
+    const target = { fromExt: `env`, toExt: `prod` };
+    const plugin = redirect({
+        targets: [ target ],
+        verbose: false
+    });
+
+    sinon.stub(console, `log`);
+
+    await plugin.resolveId.apply(t.context.rollupContext, [ `file.env`, `importer.js` ]);
+
+    t.assert(console.log.notCalled);
 });
