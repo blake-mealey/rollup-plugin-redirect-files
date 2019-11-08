@@ -12,3 +12,51 @@
 </p>
 
 A Rollup.js plugin for redirecting file imports using regular expressions.
+
+Simpler than [@rollup/plugin-alias](https://github.com/rollup/plugins/tree/master/packages/alias) for some use cases (especially redirecting file extensions for per-environment configuration files).
+
+## Installation
+
+
+```sh
+# yarn
+yarn add rollup-plugin-redirect-files -D
+ 
+# npm
+npm i rollup-plugin-redirect-files -D
+```
+
+## Usage
+
+```js
+// rollup.config.js
+import redirect from 'rollup-plugin-redirect-files';
+
+export default {
+    input: 'src/index.js',
+    output: {
+        file: 'dist/bundle.js',
+        format: 'cjs'
+    },
+    plugins: {
+        redirect({
+            verbose: false, // output redirected files to console
+            targets: [
+                { from: '^(.*regex)[0-9]*(.*)$', to: '$1$2' }, // redirect a.regex23.b → a.regex.b
+                { fromExt: 'env', toExt: 'prod' }, // redirect config.env.js → config.prod.js
+                { fromExt: '.env', toExt: '.prod' }, // same thing, style choice,
+                { fromExt: 'env', toExt: process.env.BUILD } // run rollup with `--environment BUILD:prod`
+            ]
+        });
+    }
+};
+```
+
+Behind the scenes, `fromExt`/`toExt` are mapped to:
+
+```js
+{
+    from: `^(.*)\\${fromExt}(.*)$`,
+    to: `$1${toExt}$2`
+}
+```
