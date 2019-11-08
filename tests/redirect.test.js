@@ -112,12 +112,12 @@ test(`verbose logs redirects`, async t => {
         verbose: true
     });
 
-    sinon.stub(console, `log`);
+    const logStub = sinon.stub(console, `log`);
 
     const id = `file.env`;
     const newId = await plugin.resolveId.apply(t.context.rollupContext, [ id, `importer.js` ]);
 
-    t.assert(console.log.calledOnceWithExactly(chalk.gray.dim(`redirected`),
+    t.assert(logStub.calledOnceWithExactly(chalk.gray.dim(`redirected`),
         chalk.yellow.bold(id), chalk.gray(`→`), chalk.yellow.bold(newId)));
 });
 
@@ -128,9 +128,9 @@ test(`non-verbose does not log redirects`, async t => {
         verbose: false
     });
 
-    sinon.stub(console, `log`);
+    const logStub = sinon.stub(console, `log`);
 
     await plugin.resolveId.apply(t.context.rollupContext, [ `file.env`, `importer.js` ]);
 
-    t.assert(console.log.notCalled);
+    t.assert(logStub.notCalled);
 });
