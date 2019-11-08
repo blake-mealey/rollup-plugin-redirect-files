@@ -1,15 +1,22 @@
 import { isNullOrUndefined } from 'util';
-import { missingFrom, tooManyFroms, missingToForFrom, toExtNotAllowedForFrom, missingToExtForFromExt, toNotAllowedForFromExt } from './errorMessages';
+import {
+    missingFrom,
+    tooManyFroms,
+    missingToForFrom,
+    toExtNotAllowedForFrom,
+    missingToExtForFromExt,
+    toNotAllowedForFromExt
+} from './errorMessages';
 
 function normalizeExtension(extension) {
     return extension.startsWith(`.`) ? extension : `.${extension}`;
 }
 
 function verifyTargets(targets) {
-    for (const target of targets) {
+    targets.forEach(target => {
         // General checks
         if (isNullOrUndefined(target.from) && isNullOrUndefined(target.fromExt)) {
-            throw new Error(missingFrom(target))
+            throw new Error(missingFrom(target));
         }
         if (!isNullOrUndefined(target.from) && !isNullOrUndefined(target.fromExt)) {
             throw new Error(tooManyFroms(target));
@@ -30,40 +37,51 @@ function verifyTargets(targets) {
         if (!isNullOrUndefined(target.fromExt) && !isNullOrUndefined(target.to)) {
             throw new Error(toNotAllowedForFromExt(target));
         }
-    }
+    });
 }
 
 export default function redirect(options = {}) {
     const {
-        targets = [],
+        targets: inputTargets = [],
         verbose = false
     } = options;
 
-    verifyTargets(targets);
+    verifyTargets(inputTargets);
 
-    for (const target of targets) {
+    const targets = inputTargets.map(target => {
         if (target.fromExt) {
-            target.from = `^(.*)\\${normalizeExtension(target.fromExt)}(.*)$`;
-            target.to = `$1${normalizeExtension(target.toExt)}$2`;
+            return {
+                from: `^(.*)\\${normalizeExtension(target.fromExt)}(.*)$`,
+                to: `$1${normalizeExtension(target.toExt)}$2`
+            };
         }
-    }
+        return target;
+    });
 
     return {
-        name: 'redirect-files',
+        name: `redirect-files`,
         async resolveId(id, importer) {
-            for (const target of targets) {
-                const result = id.match(target.from);
+            let groups;
+            const target = targets.find(t => {
+                const result = id.match(t.from);
                 if (result) {
-                    const groups = Array.from(result);
-                    const newId = target.to.replace(/\$[0-9]+/g, v => groups[+v.substring(1)]);
-                    const resolved = await this.resolve(newId, importer);
-                    this.addWatchFile(resolved);
-                    if (verbose) {
-                        console.log(`Redirect: ${id} -> ${newId}`);
-                    }
-                    return resolved;
+                    groups = Array.from(result);
+                    return true;
                 }
+                return false;
+            });
+
+            if (target) {
+                const newId = target.to.replace(/\$[0-9]+/g, v => groups[+v.substring(1)]);
+                const resolved = await this.resolve(newId, importer);
+                this.addWatchFile(resolved);
+                if (verbose) {
+                    // eslint-disable-next-line no-console
+                    console.log(`Redirect: ${id} -> ${newId}`);
+                }
+                return resolved;
             }
+
             return null;
         }
     };

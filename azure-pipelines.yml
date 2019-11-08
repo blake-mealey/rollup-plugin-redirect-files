@@ -2,13 +2,19 @@ trigger:
 - master
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 steps:
 - task: Npm@1
   displayName: Install dependencies
   inputs:
     command: install
+
+- task: Npm@1
+  displayName: Run linter
+  inputs:
+    command: custom
+    customCommand: run lint
 
 - task: Npm@1
   displayName: Run tests with coverage
