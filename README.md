@@ -44,7 +44,7 @@ export default {
             targets: [
                 { from: '^(.*regex)[0-9]*(.*)$', to: '$1$2' }, // redirect a.regex23.b → a.regex.b
                 { fromExt: 'env', toExt: 'prod' }, // redirect config.env.js → config.prod.js
-                { fromExt: '.env', toExt: '.prod' }, // same thing, style choice,
+                { fromExt: '.env', toExt: '.prod' }, // same thing, style choice
                 { fromExt: 'env', toExt: process.env.BUILD } // run rollup with `--environment BUILD:prod`
             ]
         });
