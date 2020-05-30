@@ -1,3 +1,9 @@
+# Dependencies
 node_modules
+
+# Build artifacts
 dist
+
+# Coverage artifacts
 .nyc_output
+coverage

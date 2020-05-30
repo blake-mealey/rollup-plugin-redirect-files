@@ -1,4 +1,4 @@
-import test from 'ava';
+import test, { todo } from 'ava';
 import sinon from 'sinon';
 import redirect from '../src';
 
@@ -7,12 +7,18 @@ test.beforeEach(t => {
     addWatchFile: sinon.fake(),
     resolve: sinon.fake(id => id),
   };
+
+  sinon.spy(console, 'log');
+});
+
+test.afterEach(() => {
+  delete console.log;
 });
 
 test('does not redirect non-matching files', async t => {
   const target = { from: 'match', to: 'redirect' };
   const plugin = redirect({
-    targets: [target],
+    targets: [target]
   });
 
   const id = 'random';
@@ -27,7 +33,7 @@ test('does not redirect non-matching files', async t => {
 test('redirects matching files', async t => {
   const target = { from: 'match', to: 'redirect' };
   const plugin = redirect({
-    targets: [target],
+    targets: [target]
   });
 
   const id = 'match';
@@ -42,7 +48,7 @@ test('redirects matching files', async t => {
 test('redirects matching files with capture group replacement', async t => {
   const target = { from: /^(first)-(second)$/, to: 'redirect-$1-$2' };
   const plugin = redirect({
-    targets: [target],
+    targets: [target]
   });
 
   const id = 'first-second';
@@ -57,7 +63,7 @@ test('redirects matching files with capture group replacement', async t => {
 test('does not redirect non-matching file extensions', async t => {
   const target = { fromExt: '.env', toExt: '.prod' };
   const plugin = redirect({
-    targets: [target],
+    targets: [target]
   });
 
   const id = 'file.dev';
@@ -72,7 +78,7 @@ test('does not redirect non-matching file extensions', async t => {
 test('redirects matching file extensions', async t => {
   const target = { fromExt: '.env', toExt: '.prod' };
   const plugin = redirect({
-    targets: [target],
+    targets: [target]
   });
 
   const id = 'file.env';
@@ -87,7 +93,7 @@ test('redirects matching file extensions', async t => {
 test('normalizes and redirects matching file extensions', async t => {
   const target = { fromExt: 'env', toExt: 'prod' };
   const plugin = redirect({
-    targets: [target],
+    targets: [target]
   });
 
   const id = 'file.env';
@@ -97,4 +103,39 @@ test('normalizes and redirects matching file extensions', async t => {
   t.is(newId, 'file.prod');
   sinon.assert.calledWithExactly(t.context.rollupContext.resolve, newId, importer);
   sinon.assert.calledWithExactly(t.context.rollupContext.addWatchFile, newId);
+});
+
+todo('redirects multiple targets');
+todo('redirects multiple matches');
+todo('redirects nothing with empty targets');
+todo('redirects nothing with null options');
+todo('redirects nothing with empty options');
+
+test('non-verbose mode does not log to the console', async t => {
+  const target = { from: 'match', to: 'redirect' };
+  const plugin = redirect({
+    targets: [target]
+  });
+
+  const id = 'match';
+  const importer = 'importer.js';
+  const newId = await plugin.resolveId.apply(t.context.rollupContext, [id, importer]);
+
+  t.is(newId, target.to);
+  sinon.assert.notCalled(console.log);
+});
+
+test('verbose mode logs to the console', async t => {
+  const target = { from: 'match', to: 'redirect' };
+  const plugin = redirect({
+    targets: [target],
+    verbose: true
+  });
+
+  const id = 'match';
+  const importer = 'importer.js';
+  const newId = await plugin.resolveId.apply(t.context.rollupContext, [id, importer]);
+
+  t.is(newId, target.to);
+  sinon.assert.called(console.log);
 });
